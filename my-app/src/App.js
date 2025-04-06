@@ -1,15 +1,27 @@
-//import logo from './logo.svg';
-import './App.css';
 import React from "react";
-import Greeting from './Greeting';
-const App = () => {
-   
-  return (
-    <div>
-      <Greeting name={123} age="twenty" isMember="true" />
-    </div>
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Users from "./pages/Users";
+import UserDetail from "./pages/UserDetail";
+import Navbar from "./components/Navbar";
+
+
+function App() {
+   return (
+    <BrowserRouter>
+     <Navbar />
+     <Routes>
+         <Route path="/" element={<Home />} />
+         <Route path="/about" element={<About />} />
+         <Route path="/users" element={<Users />} />
+         <Route path="/users/:id" element={<UserDetail />} />
+     </Routes>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;
+
+
 

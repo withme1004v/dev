@@ -1,0 +1,270 @@
+http://210.181.145.100:8080/reactjs.html
+
+/* 실습1 : JSX  {}에는 리턴값을 가지는 표현식이라면 무엇이든 배치할 수 있다 */
+
+import logo from './logo.svg';
+import './App.css';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <h2>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+    </div>
+  );
+};
+
+export default App;
+
+
+
+--------------------------------------------
+StrictMode는 개발 모드에서만 활성화됩니다.
+실제 렌더링 성능에 영향을 주지 않지만, 개발자가 더 안전하고 버그가 적은 코드를 작성할 수 있도록 도와줍니다.
+React 애플리케이션을 개발하는 동안 잠재적인 문제를 찾아내고, 코드 품질을 향상시키는 데 중요한 도구
+
+-----------------------------------------------
+[ React에 bootstrap 적용 실습]
+
+1. React 프로젝트에서 npm install bootstrap
+2. index.js에 bootstrap.css import
+import 'bootstrap/dist/css/bootstrap.css';
+3. addResult()의 리턴 UI에 bootstrap 스타일 적용
+import logo from './logo.svg';
+import './App.css';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <h2>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+    </div>
+  );
+};
+
+export default App;
+
+--------------------------------------------------------------------------------
+CSS를 컴포넌트 단위로 캡슐화한 CSS 모듈 적용 실습
+
+/* Button.module.css*/
+.button {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Button.js*/
+import React from "react";
+import styles from "./Button.module.css";            // CSS 모듈 import
+
+const Button = ()=> {
+  return <button className={styles.button}>Click Me</button>;
+}
+
+export default Button;
+
+
+/* App.js  수정 */
+import logo from './logo.svg';
+import './App.css';
+import Button from './Button';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+  const style = {
+    backgroundColor:'black', 
+    padding:'16px', 
+    color:'white', 
+    fontSize:'36px'
+    };
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+
+    </div>
+  );
+};
+
+export default App;
+
+--------------------------------------------------------------------------------
+/* Styled Components (CSS-in-JS) 실습 */
+D:\dev\my-app>npm install styled-components
+
+
+/* MyButton.js*/
+import React from "react";
+import styled from "styled-components"; // styled-components import
+
+const StyledButton = styled.button`
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+`;
+function MyButton() {
+  return <StyledButton>Click Me</StyledButton>;
+}
+export default MyButton;
+
+
+
+/* App.js  수정 */
+import logo from './logo.svg';
+import './App.css';
+import MyButton from './MyButton';
+
+const App = () => {
+ ......
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+	<MyButton />
+
+    </div>
+  );
+};
+
+export default App;
+
+---------------------------------------------------------------------
+[JSX의 {} 에서 if 대신 삼항 연산자, for문 대신 배열 요소에 map() 적용 실습 ]
+
+/* ItemList.js */
+import React  from "react";
+import {useState} from "react";
+
+const ItemList = ()=> {
+    const [items, setItems] = useState([
+      { id: 1, name: "Apple" },
+      { id: 2, name: "Banana" },
+      { id: 3, name: "Cherry" },
+    ]);
+  const removeItem = (id) => {           // 리스트에서 항목 제거
+      setItems(items.filter((item) => item.id !== id));
+    };
+    return (
+      <div>    <h3>Fruit List</h3>
+        <ul>
+          {items.map((item) => (
+            <li  key={item.id}>
+              {item.name} <button onClick={ () => removeItem(item.id) }>삭제</button>
+            </li>
+          ))}
+        </ul>  
+          
+        </div>
+    );
+  } 
+
+  
+  export default ItemList;
+
+
+
+
+
+/* App.js   */
+import logo from './logo.svg';
+import './App.css';
+import Button from './Button';
+import MyButton from './MyButton';
+import ItemList from './ItemList';
+
+const App = () => {
+  console.log("App 전체 렌더링");
+  let msg = (<i>World</i>);
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+  const style = {
+    backgroundColor:'black', 
+    padding:'16px', 
+    color:'white', 
+    fontSize:'36px'
+    };
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+      <MyButton />
+      <ItemList />
+    </div>
+  );
+};
+
+export default App;
+
+
+---------------------------------------------------------------------------
+/* class형태의 Counter 컴포넌트의 state 초기화 변경  실습의 App.js */
+
+import logo from './logo.svg';
+import './App.css';
+import Counter from './Counter';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Counter />
+    </div>
+  );
+};
+
+export default App;
+
+
+
+
+

@@ -1,0 +1,497 @@
+/* 실습1 : JSX  {}에는 리턴값을 가지는 표현식이라면 무엇이든 배치할 수 있다 */
+
+import logo from './logo.svg';
+import './App.css';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <h2>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+    </div>
+  );
+};
+
+export default App;
+
+
+
+--------------------------------------------
+StrictMode는 개발 모드에서만 활성화됩니다.
+실제 렌더링 성능에 영향을 주지 않지만, 개발자가 더 안전하고 버그가 적은 코드를 작성할 수 있도록 도와줍니다.
+React 애플리케이션을 개발하는 동안 잠재적인 문제를 찾아내고, 코드 품질을 향상시키는 데 중요한 도구
+
+
+-----------------------------------------------
+[ React에 bootstrap 적용 실습]
+
+1. React 프로젝트에서 npm install bootstrap
+2. index.js에 bootstrap.css import
+import 'bootstrap/dist/css/bootstrap.css';
+3. addResult()의 리턴 UI에 bootstrap 스타일 적용
+import logo from './logo.svg';
+import './App.css';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <h2>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+    </div>
+  );
+};
+
+export default App;
+
+--------------------------------------------------------------------------------
+CSS를 컴포넌트 단위로 캡슐화한 CSS 모듈 적용 실습
+
+/* Button.module.css*/
+.button {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Button.js*/
+import React from "react";
+import styles from "./Button.module.css";            // CSS 모듈 import
+
+const Button = ()=> {
+  return <button className={styles.button}>Click Me</button>;
+}
+
+export default Button;
+
+
+/* App.js  수정 */
+import logo from './logo.svg';
+import './App.css';
+import Button from './Button';
+
+const App = () => {
+  let msg = "World";
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+  const style = {
+    backgroundColor:'black', 
+    padding:'16px', 
+    color:'white', 
+    fontSize:'36px'
+    };
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+
+    </div>
+  );
+};
+
+export default App;
+
+--------------------------------------------------------------------------------
+/* Styled Components (CSS-in-JS) 실습 */
+D:\dev\my-app>npm install styled-components
+
+
+/* MyButton.js*/
+import React from "react";
+import styled from "styled-components"; // styled-components import
+
+const StyledButton = styled.button`
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+`;
+function MyButton() {
+  return <StyledButton>Click Me</StyledButton>;
+}
+export default MyButton;
+
+
+
+/* App.js  수정 */
+import logo from './logo.svg';
+import './App.css';
+import MyButton from './MyButton';
+
+const App = () => {
+ ......
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+	<MyButton />
+
+    </div>
+  );
+};
+
+export default App;
+
+---------------------------------------------------------------------
+[JSX의 {} 에서 if 대신 삼항 연산자, for문 대신 배열 요소에 map() 적용 실습 ]
+
+/* ItemList.js */
+import React  from "react";
+import {useState} from "react";
+
+const ItemList = ()=> {
+    const [items, setItems] = useState([
+      { id: 1, name: "Apple" },
+      { id: 2, name: "Banana" },
+      { id: 3, name: "Cherry" },
+    ]);
+  const removeItem = (id) => {           // 리스트에서 항목 제거
+      setItems(items.filter((item) => item.id !== id));
+    };
+    return (
+      <div>    <h3>Fruit List</h3>
+        <ul>
+          {items.map((item) => (
+            <li  key={item.id}>
+              {item.name} <button onClick={ () => removeItem(item.id) }>삭제</button>
+            </li>
+          ))}
+        </ul>  
+          
+        </div>
+    );
+  } 
+
+  
+  export default ItemList;
+
+
+
+
+
+/* App.js   */
+import logo from './logo.svg';
+import './App.css';
+import Button from './Button';
+import MyButton from './MyButton';
+import ItemList from './ItemList';
+
+const App = () => {
+  console.log("App 전체 렌더링");
+  let msg = (<i>World</i>);
+  const addResult = (x , y ) => {
+    return (
+      <div className='card card-body bg-light mb-3'>
+        {x} + {y} = {x + y}
+      </div>
+    );
+  };
+  const style = {
+    backgroundColor:'black', 
+    padding:'16px', 
+    color:'white', 
+    fontSize:'36px'
+    };
+
+  return (
+    <div>
+      <h2 style={style}>Hello {msg}!</h2>
+      <hr />
+      {addResult(4, 3)}
+      <hr />
+      <Button />
+      <MyButton />
+      <ItemList />
+    </div>
+  );
+};
+
+export default App;
+
+
+---------------------------------------------------------------------------
+/* class형태의 Counter 컴포넌트의 state 초기화 변경  실습의 App.js */
+
+import logo from './logo.svg';
+import './App.css';
+import Counter from './Counter';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Counter />
+    </div>
+  );
+};
+
+export default App;
+
+---------------------------------------------------------------------------
+/* 함수형태의 Timer 컴포넌트의 useState(), useEffect() Hook  실습의 App.js */
+
+import logo from './logo.svg';
+import './App.css';
+import Timer from './Timer';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Timer />
+    </div>
+  );
+};
+
+export default App;
+
+
+
+/* Timer.js */
+import React, { useState, useEffect } from "react";
+
+function Timer() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log("컴포넌트가 처음 마운트됨!");
+  }, []); // [] 빈 배열 → 최초 1회 실행
+
+  return (
+    <div>
+      <h1>카운트: {count}</h1>
+      <button onClick={() => setCount(count + 1)}>증가</button>
+    </div>
+  );
+}
+
+export default Timer;
+--------------------------------------------------------------------
+/*  props는 read only 이므로 변경하면 오류 발생합니다  */
+
+/* Greeting.js */
+//Props는 변경할 수 없다 (Read-Only)
+import React from "react";
+
+ function Greeting(props) {
+  props.name = "변경된 값"; //  오류 발생
+  return <h1>안녕하세요, {props.name}님!</h1>;
+}
+export default Greeting;
+
+
+import logo from './logo.svg';
+import './App.css';
+import Greeting from './Greeting';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Greeting name="아이유" />
+    </div>
+  );
+};
+
+export default App;
+
+--------------------------------------------------------------------------
+/* 객체를 Props로 전달  실습 */
+
+/* Car.js */
+import React from "react";
+
+function Car(props) {
+  return <h2>I am a { props.brand.model }!</h2>;
+}
+
+export default Car;
+
+
+/* Garage.js */
+import React from "react";
+import Car from "./Car";
+
+function Garage() {
+  const carInfo = { name: "Ford", model: "Mustang" };
+  return (
+    <>
+      <h1>Who lives in my garage?</h1>
+      <Car brand={ carInfo } />
+    </>
+  );
+}
+
+export default Garage;
+
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import Garage from './Garage';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Garage />
+    </div>
+  );
+};
+
+export default App;
+
+
+--------------------------------------------------------------------
+/*  props의 속성에 기본값 사용 실습  */
+
+/* Greeting.js */
+import React from "react";
+
+const  Greeting = ({name = "손님"}) => { 
+  return <h1>안녕하세요, {name}님!</h1>;
+}
+
+/*
+React 18버전부터  함수형 Component에서 지원 안됨 (Vite 기반 React 프로젝트에서 지원 X)
+Greeting.defaultProps = {
+  name: "손님",
+};
+*/
+
+export default Greeting;
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import Greeting from './Greeting';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Greeting  />
+    </div>
+  );
+};
+
+export default App;
+
+
+------------------------------------------------------------------
+/*  컴포넌트의 props 타입을 검증해주는 개발 도구 실습 */
+
+
+my-app>  npm install prop-types
+
+ 
+/* Calc.js */
+import React from "react";
+import PropTypes from "prop-types";
+
+const Calc = (props) => {
+  let result = 0;
+
+  switch (props.oper) {
+    case "+":
+      result = props.x + props.y;
+      break;
+    case "*":
+      result = props.x * props.y;
+      break;
+    default:
+      result = 0;
+  }
+
+  return (
+    <div>
+      <h3>연산 방식 : {props.oper}</h3>
+      <hr />
+      <div>
+        {props.x} {props.oper} {props.y} = {result}
+      </div>
+    </div>
+  );
+};
+
+// 사용자 정의 PropTypes 검사 함수
+const calcChecker = (props, propName, componentName) => {
+  if (propName === "oper") {
+    if (props[propName] !== "+" && props[propName] !== "*") {
+      return new Error(
+        `${propName} 속성의 값은 반드시 '+', '*'만 허용합니다 (at ${componentName}).`
+      );
+    }
+  }
+
+  if (propName === "y") {
+    const y = props[propName];
+    if (y > 100 || y < 0 || y % 2 !== 0) {
+      return new Error(
+        `${propName} 속성의 값은 0 이상 100 이하의 짝수만 허용합니다 (at ${componentName}).`
+      );
+    }
+  }
+
+  // 유효한 경우 return undefined
+};
+
+Calc.propTypes = {
+  x: PropTypes.number.isRequired,
+  y: calcChecker,
+  oper: calcChecker,
+};
+
+export default Calc;
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+

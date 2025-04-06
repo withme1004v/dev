@@ -1,0 +1,1044 @@
+이벤트 처리 방법/조건부 렌더링
+------------------------------------------------
+/* MyForm.js */
+import { useState } from 'react';
+import ReactDOM from 'react-dom/client';
+
+function MyForm() {
+
+    const [inputs, setInputs] = useState({});
+
+
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setInputs(values => ({...values, [name]: value}))
+  }
+
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert(inputs.username+","+inputs.age);
+  }
+
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>Enter your name:
+      <input 
+        type="text" 
+        name="username" 
+        value={inputs.username || ""} 
+        onChange={handleChange}
+      />
+      </label>
+      <label>Enter your age:
+        <input 
+          type="number" 
+          name="age" 
+          value={inputs.age || ""} 
+          onChange={handleChange}
+        />
+        </label>
+        <input type="submit" />
+    </form>
+
+  )
+}
+
+export default MyForm;
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import MyForm from './MyForm';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <MyForm  />
+    </div>
+  );
+};
+
+export default App;
+--------------------------------------------------------------------------------
+
+ref는 React에서 직접적으로 DOM에 접근하거나, 컴포넌트의 내부 메서드나 값에 접근해야 할 때 사용하는 특수한 프로퍼티
+DOM 요소에 직접 접근 (예: input에 포커스 주기) , 스크롤 위치 조정, 텍스트 선택,
+
+/* 함수형 컴포넌트 + useRef 사용   FocusInput.js   */
+import React, { useRef } from "react";
+
+function FocusInput() {
+  const inputRef = useRef(null); // ref 객체 생성
+
+  const handleClick = () => {
+    inputRef.current.focus(); // DOM 요소에 직접 접근
+  };
+
+  return (
+    <div>
+      <input ref={inputRef} type="text" />
+      <button onClick={handleClick}>Focus the input</button>
+    </div>
+  );
+}
+
+export default FocusInput;
+
+
+/* 
+ref를 특정 DOM 요소에 연결하면, 그 DOM에 직접 접근 가능
+스크롤 위치 조정 함수형 컴포넌트 
+버튼을 클릭하면 ref가 가리키는 DOM 요소로 스크롤 합니다.
+*/
+import React, { useRef } from 'react';
+
+export default function ScrollMove() {
+  const section1Ref = useRef(null);
+  const section2Ref = useRef(null);
+  const section3Ref = useRef(null);
+
+   //scrollIntoView() 스크롤되도록 화면에 표시해주는 메서드
+    const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+ 
+  return (
+    <div>
+      <nav style={{ position: 'fixed', top: 0, background: '#fff', width: '100%', padding: '1rem', zIndex: 10 }}>
+        <button onClick={() => scrollToSection(section1Ref)}>Section 1</button>
+        <button onClick={() => scrollToSection(section2Ref)}>Section 2</button>
+        <button onClick={() => scrollToSection(section3Ref)}>Section 3</button>
+      </nav>
+
+      <div style={{ paddingTop: '4rem' }}>
+        <section ref={section1Ref} style={{ height: '100vh', backgroundColor: '#f8b400' }}>
+          <h2>Section 1</h2>
+        </section>
+        <section ref={section2Ref} style={{ height: '100vh', backgroundColor: '#6a2c70' }}>
+          <h2>Section 2</h2>
+        </section>
+        <section ref={section3Ref} style={{ height: '100vh', backgroundColor: '#b83b5e' }}>
+          <h2>Section 3</h2>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+ 
+
+
+
+-----------------------------------------------------------------------------
+/* 
+조건부 렌더링 실습
+isLoggedIn 상태에 따라 <LoginButton /> 또는 <LogoutButton />을 선택적으로 렌더링
+ */
+
+/*  LoginButton.js */
+import React  from "react";
+
+function LoginButton(props) {
+  return (
+    <button onClick={props.onClick}>
+      Login
+    </button>
+  );
+}
+
+export default   LoginButton;
+
+
+
+/*  LogoutButton.js */
+import React  from "react";
+
+function LogoutButton(props) {
+  return (
+    <button onClick={props.onClick}>
+      Logout
+    </button>
+  );
+}
+
+export default   LogoutButton;
+
+
+/* Greeting.js */
+import React  from "react";
+
+function Greeting(props) {
+  if (props.isLoggedIn) {
+    return <h1>Welcome back!</h1>;
+  }
+  return <h1>Please sign up.</h1>;
+}
+
+export default  Greeting;
+
+
+
+/*  LoginControl.js */
+
+import React    from "react";
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
+import Greeting from "./Greeting";
+
+class LoginControl extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleLoginClick = this.handleLoginClick.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
+    this.state = {isLoggedIn: false};
+  }
+
+  handleLoginClick() {
+    this.setState({isLoggedIn: true});
+  }
+
+  handleLogoutClick() {
+    this.setState({isLoggedIn: false});
+  }
+
+  render() {
+    const isLoggedIn = this.state.isLoggedIn;
+    let button;
+    if (isLoggedIn) {
+      button = <LogoutButton onClick={this.handleLogoutClick} />;
+    } else {
+      button = <LoginButton onClick={this.handleLoginClick} />;
+    } 
+
+return (
+      <div>
+        <Greeting isLoggedIn={isLoggedIn} />
+        {button}
+      </div>
+    );
+  }
+}
+ 
+export default  LoginControl ;
+
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import LoginControl from './LoginControl';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <LoginControl  />
+    </div>
+  );
+};
+
+export default App;
+----------------------------------------------------------------------
+함수형 컴포넌트와 클래스형 컴포넌트 (Lifecycle)
+----------------------------------------------------------------
+import React, { Component } from "react";
+
+class LifeCycleDemoClass extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+    };
+    console.log("constructor 호출");
+  }
+
+  // componentDidMount (마운트 시)
+  componentDidMount() {
+    console.log("컴포넌트가 마운트되었습니다.");
+  }
+
+  // componentDidUpdate (업데이트 시)
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.count !== this.state.count) {
+      console.log(`count가 업데이트되었습니다: ${this.state.count}`);
+    }
+  }
+
+  // componentWillUnmount (언마운트 시)
+  componentWillUnmount() {
+    console.log("컴포넌트가 언마운트됩니다.");
+  }
+
+  handleIncrement = () => {
+    this.setState((prevState) => ({
+      count: prevState.count + 1,
+    }));
+  };
+
+  render() {
+    return (
+      <div>
+        <h2>LifeCycle Demo (Class)</h2>
+        <p>Count: {this.state.count}</p>
+        <button onClick={this.handleIncrement}>+ 증가</button>
+      </div>
+    );
+  }
+}
+
+export default LifeCycleDemoClass;
+
+
+/*  App.js */
+import logo from './logo.svg';
+import './App.css';
+import LifeCycleDemoClass from './LifeCycleDemoClass';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <LifeCycleDemoClass  />
+    </div>
+  );
+};
+
+export default App;
+
+---------------------------------------------------------------------------------------
+/*
+getDerivedStateFromProps(props, state) : static 메서드
+props가 변경되었을 때, state를 업데이트할 필요가 있을 경우 사용
+컴포넌트가 처음 마운트되거나 업데이트되기 직전에 호출됩니다
+this를 사용할 수 없습니다.
+
+shouldComponentUpdate(nextProps, nextState) : 컴포넌트가 리렌더링될지 여부를 결정
+렌더링 성능 최적화에 주로 사용됨
+render() 호출 전, 업데이트가 일어나기 전에 호출됩니다.
+
+getSnapshotBeforeUpdate(prevProps, prevState)  :  업데이트되기 직전의 DOM 상태를 캡처해서 componentDidUpdate()로 전달할 수 있습니다.
+render() 후 (가상 DOM에는 변경) , 브라우저 DOM 변경 전 호출됩니다
+
+componentDidUpdate(prevProps, prevState, snapshot) :
+컴포넌트가 업데이트된 직후에 호출 
+DOM 업데이트 이후의 작업의 네트워크 요청, 스크롤 위치 조정 등의 작업에 적합
+*/
+
+/* LifeCycleUpdate.js  */
+
+import React, { Component } from "react";
+
+class LifeCycleUpdate extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+    };
+    console.log('constructor');
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    console.log('getDerivedStateFromProps');
+    return null; // state를 변경할 필요가 없을 때 null 반환
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('shouldComponentUpdate');
+    return true; // false를 반환하면 렌더링이 막힘
+  }
+
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    console.log('getSnapshotBeforeUpdate');
+    return `이전 count: ${prevState.count}`;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('componentDidUpdate');
+    console.log('snapshot:', snapshot);
+  }
+
+  handleClick = () => {
+    this.setState((prevState) => ({
+      count: prevState.count + 1,
+    }));
+  };
+
+  render() {
+    console.log('render');
+    return (
+      <div>
+        <p>Count: {this.state.count}</p>
+        <button onClick={this.handleClick}>Increment</button>
+      </div>
+    );
+  }
+}
+
+export  default LifeCycleUpdate;
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import LifeCycleUpdate from './LifeCycleUpdate';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <LifeCycleUpdate  />
+    </div>
+  );
+};
+
+export default App;
+
+----------------------------------------------------------------
+
+/*+ useEffect()로 생명주기 확인 실습  */ 
+import React, { useEffect, useState } from "react";
+
+function LifeCycleDemo() {
+  const [count, setCount] = useState(0);
+
+  //  componentDidMount + componentWillUnmount
+  useEffect(() => {
+    console.log("컴포넌트가 마운트되었습니다.");
+
+    return () => {
+      console.log("컴포넌트가 언마운트됩니다.");
+    };
+  }, []); // 빈 배열: 마운트 시 1회 실행
+
+  // componentDidUpdate (count가 변경될 때)
+  useEffect(() => {
+    console.log(`count가 업데이트되었습니다: ${count}`);
+  }, [count]); // count가 변경될 때마다 실행
+
+  return (
+    <div>
+      <h2>LifeCycle Demo</h2>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+ 증가</button>
+    </div>
+  );
+}
+
+export default LifeCycleDemo;
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import LifeCycleDemo from './LifeCycleDemo';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <LifeCycleDemo  />
+    </div>
+  );
+};
+
+export default App;
+
+
+------------------------------------------------------------------
+React Hooks  : useReducer
+useReducer는 useState와 유사하지만, 더 복잡한 상태 관리 로직을 처리할 수 있도록 설계된 Hook
+ (컴포넌트 내부에서 상태 관리하지 않고 외부로 분리할 수 있도록 ..)
+
+
+const [state, dispatch] = useReducer(reducer, initialState);
+=> dispatch(action)을 사용해 reducer 함수 실행
+
+- 상태 업데이트가 여러 단계로 이루어지거나, 복잡한 로직이 필요할 때 사용
+- 여러 개의 관련된 상태를 하나의 state 객체에서 관리할 때 사용
+
+/* useReducer 사용 카운터 증가/감소 기능 : Counter.js */
+
+import { useReducer } from "react";
+
+const initialState = { count: 0 };
+
+// Reducer 함수 (상태를 변경하는 로직)
+function reducer(state, action) {
+    switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    case "reset":
+      return { count: 0 };
+    default:
+      throw new Error("Unhandled action type");
+  }	
+}
+
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <>
+      <h1>Count: {state.count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+    </>
+  );
+}
+
+export default Counter;
+
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import Counter from './Counter';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Counter  />
+    </div>
+  );
+};
+
+export default App;
+
+
+------------------------------------------------------------
+React Hooks  : useRef
+
+/* Counter.js */
+
+import { useState, useRef , useEffect} from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(0);  // 0 이라는 값에 대한 참조를 가지는 객체 반환
+
+
+  useEffect(() => {
+    console.log("렌더링 발생! 현재 count:", count);
+  });
+
+  const handleStateClick = () => {
+    setCount(count + 1); // 상태 변경 → 리렌더링 발생    
+  };
+
+  const handleRefClick = () => {     
+    countRef.current += 1; // useRef 값 변경 → 리렌더링 없음
+    console.log("useRef 값:", countRef.current);
+  };
+
+
+  return (
+    <>
+      <p>useState Count: {count}</p>
+      <p>useRef Count (렌더링 안 됨): {countRef.current}</p>
+      <button onClick={handleStateClick}>useState 증가</button>
+     <button onClick={handleRefClick}>useRef 증가</button>
+
+    </>
+  );
+}
+
+export default Counter;
+
+//count는 useState이므로 버튼을 클릭할 때마다 리렌더링됨
+//countRef.current는 값이 변경되어도 리렌더링되지 않음
+
+--------------------------------------------------------------------
+React Hooks  : useMemo
+종속성 배열에 포함된 값(리소스를 많이 사용하는 계산된 값)이  변경될 때만 실행
+
+/*
+expensiveCalculation(count)는 계산 비용이 높은 함수로, count가 변경될 때마다 실행됩니다.
+todos 상태가 변경될 때도 expensiveCalculation이 불필요하게 다시 실행됩니다.
+ App.js
+*/
+
+import { useState } from "react";
+import ReactDOM from "react-dom/client";
+
+const App = () => {
+  const [count, setCount] = useState(0);
+  const [todos, setTodos] = useState([]);
+  const calculation = expensiveCalculation(count);
+
+  const increment = () => {
+    setCount((c) => c + 1);
+  };
+  const addTodo = () => {
+    setTodos((t) => [...t, "New Todo"]);
+  };
+
+  return (
+    <div>
+      <div>
+        <h2>My Todos</h2>
+        {todos.map((todo, index) => {
+          return <p key={index}>{todo}</p>;
+        })}
+        <button onClick={addTodo}>Add Todo</button>
+      </div>
+      <hr />
+      <div>
+        Count: {count}
+        <button onClick={increment}>+</button>
+        <h2>Expensive Calculation</h2>
+        {calculation}
+      </div>
+    </div>
+  );
+};
+
+const expensiveCalculation = (num) => {
+  console.log("Calculating...");
+  for (let i = 0; i < 1000000000; i++) {
+    num += 1;
+  }
+  return num;
+};
+
+export default App;
+
+
+/*  
+useMemo를 사용하여 expensiveCalculation이 count가 변경될 때만 실행되도록 개선
+App.js 
+*/
+import { useState, useMemo  } from "react";
+import ReactDOM from "react-dom/client";
+
+const App = () => {
+  const [count, setCount] = useState(0);
+  const [todos, setTodos] = useState([]);
+  const calculation = useMemo(() => expensiveCalculation(count), [count]);
+
+  const increment = () => {
+    setCount((c) => c + 1);
+  };
+  
+  const addTodo = () => {
+    setTodos((t) => [...t, "New Todo"]);
+  };
+ 
+  return (
+    <div>
+      <div>
+        <h2>My Todos</h2>
+         {todos.map((todo, index) => {
+          return <p key={index}>{todo}</p>;
+        })}
+        <button onClick={addTodo}>Add Todo</button>
+      </div>   
+      <hr />
+      <div>
+        Count: {count}
+        <button onClick={increment}>+</button>
+        <h2>Expensive Calculation</h2>
+        {calculation}
+      </div>
+    </div>
+  );
+};
+
+const expensiveCalculation = (num) => {
+  console.log("Calculating...");
+  for (let i = 0; i < 1000000000; i++) {
+    num += 1;
+  }
+  return num;
+};
+
+export default App;
+
+
+--------------------------------------------------------------------
+React Hook : useCallback 
+
+/*
+useCallback을 사용하여 addTodo를 메모이제이션하면 , todos가 변경되지 않는 한 Todos가 다시 렌더링되지 않습니다.
+addTodo는 todos가 변경될 때만 새롭게 생성되므로, Todos가 불필요하게 렌더링되지 않습니다
+*/
+
+
+/* Todos.js */
+
+import React from "react";
+
+const Todos = React.memo(({ todos, addTodo }) => {
+  console.log("Todos 컴포넌트 렌더링");
+
+  return (
+    <div>
+      <h3>할 일 목록</h3>
+      {todos.map((todo, idx) => (
+        <p key={idx}>{todo}</p>
+      ))}
+      <button onClick={addTodo}>할 일 추가</button>
+    </div>
+  );
+});
+
+export default Todos;
+
+
+
+/* App.js */
+
+import { useState, useCallback } from "react";
+import Todos from "./Todos";
+
+const App = () => {
+  const [count, setCount] = useState(0);
+  const [todos, setTodos] = useState([]);
+
+  const increment = () => {
+    setCount((c) => c + 1);
+  };
+
+  // useCallback 적용하지 않으면 렌더링마다 새로운 함수가 생성됨
+/*
+  const addTodo = useCallback(() => {
+	console.log("addTodo 함수가 새로 생성됨");
+    setTodos((prev) => [...prev, "New Todo"]);
+  }, [setTodos]);
+*/
+   
+   const addTodo =() => {
+     console.log("addTodo 함수가 새로 생성됨");
+    setTodos((prev) => [...prev, "New Todo"]);
+  };
+
+  
+
+
+  return (
+    <div>
+      <h2>useCallback 예제</h2>
+      <Todos todos={todos} addTodo={addTodo} />
+      <hr />
+      <div>
+        <p>Count: {count}</p>
+        <button onClick={increment}>+</button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+--------------------------------------------------------------------
+컴포넌트 간 데이터 흐름과 상태 관리 심화 (Context API)
+-----------------------------------------------------------------------
+useContext는 컴포넌트 트리에서 전역적으로 상태를 공유하는 방법을 제공하는 Hook
+중간 단계의 컴포넌트들을 통해서 상태(state) 를 전달하지 않고 하위 컴포넌트들이 직접 상태
+
+useState는 로컬 상태(해당 컴포넌트 내부에서만 사용되는 상태)를 관리
+
+
+import { useState } from "react";
+import ReactDOM from "react-dom/client";
+
+function Component1() {
+  const [user, setUser] = useState("아이유");
+
+  return (
+    <>
+      <h1>{`Hello ${user}!`}</h1>
+      <Component2 user={user} />
+    </>
+  );
+}
+
+export default Component1;
+
+
+
+import Component3 from "./Component3";
+
+function Component2({ user }) {
+  return (
+    <>
+      <h1>Component 2</h1>
+      <Component3 user={user} />
+    </>
+  );
+}
+
+export default Component2;
+
+
+
+import Component4 from "./Component4";
+
+function Component3({ user }) {
+  return (
+    <>
+      <h1>Component 3</h1>
+      <Component4 user={user} />
+    </>
+  );
+}
+
+export default Component3;
+
+
+
+import Component5 from "./Component5";
+
+function Component4({ user }) {
+  return (
+    <>
+      <h1>Component 4</h1>
+      <Component5 user={user} />
+    </>
+  );
+}
+
+export default Component4;
+
+
+ 
+
+function Component5({ user }) {
+  return (
+    <>
+      <h1>Component 5</h1>
+      <h2>{`Hello ${user} again!`}</h2>      
+    </>
+  );
+}
+
+export default Component5;
+
+
+/* App.js */
+import logo from './logo.svg';
+import './App.css';
+import Component1 from './Component1';
+ 
+const App = () => {
+   
+  return (
+    <div>
+      <Component1  />
+    </div>
+  );
+};
+
+export default App;
+
+
+----------------------------------------------------------------------------
+// UserContext.js
+import { createContext } from "react";
+
+const UserContext = createContext();
+
+export default UserContext;
+
+
+
+
+//Component1.js
+import { useState, createContext, useContext } from "react";
+import ReactDOM from "react-dom/client";
+import Component2 from './Component2';
+import UserContext from './UserContext';
+
+
+function Component1() {
+  const [user, setUser] = useState("Korea, Seoul");
+
+  return (
+    <UserContext.Provider value={user}>
+      <h1>{`Hello ${user}!`}</h1>
+      <Component2 />
+    </UserContext.Provider>
+  );
+}
+
+export default Component1;
+
+
+
+import Component3 from './Component3';
+function Component2() {
+  return (
+    <>
+      <h1>Component 2</h1>
+      <Component3 />
+    </>
+  );
+}
+
+export default Component2;
+
+
+
+import Component4 from './Component4';
+function Component3() {
+  return (
+    <>
+      <h1>Component 3</h1>
+      <Component4 />
+    </>
+  );
+}
+
+export default Component3;
+
+
+import Component5 from './Component5';
+function Component4() {
+  return (
+    <>
+      <h1>Component 4</h1>
+      <Component5 />
+    </>
+  );
+}
+export default Component4;
+
+
+import { useContext } from "react";
+import UserContext from './UserContext'; 
+
+function Component5() {
+  const user = useContext(UserContext);
+
+  return (
+    <>
+      <h1>Component 5</h1>
+      <h2>{`Hello ${user} again!`}</h2>
+    </>
+  );
+}
+
+export default Component5;
+
+
+----------------------------------------------------------
+React Router를 이용한 페이지 네비게이션
+
+//메뉴 링크
+//src/components/Navbar.js
+
+import React from "react";
+import { Link } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav style={{ padding: "1rem", backgroundColor: "#eee" }}>
+      <Link to="/" style={{ marginRight: "1rem" }}>Home</Link>
+      <Link to="/about" style={{ marginRight: "1rem" }}>About</Link>
+      <Link to="/users">Users</Link>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+
+//src/pages/Home.js
+import React from "react";
+const Home = () => {
+  return <h2>Home Page</h2>;
+};
+
+export default Home;
+
+
+//src/pages/About.js
+import React from "react";
+const About = () => {
+  return <h2>About Page</h2>;
+};
+
+export default About;
+
+
+
+
+//src/pages/Users.js
+import { Link } from "react-router-dom";
+
+const dummyUsers = [
+  { id: 1, name: "Korea" },
+  { id: 2, name: "Seoul" },
+]
+
+const Users = () => {
+  return (
+    <div>
+      <h2>Users Page</h2>
+      <ul>
+        {dummyUsers.map(user => (
+          <li key={user.id}>
+            <Link to={`/users/${user.id}`}>{user.name}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Users;
+
+
+//src/pages/UserDetail.js
+import { useParams } from "react-router-dom";
+
+const UserDetail = () => {
+   const { id } = useParams();
+    
+     return <h3>Details for User ID: {id}</h3>;
+};
+
+export default UserDetail;
+
+
+
+/* App.js - 라우터 설정 */
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Users from "./pages/Users";
+import UserDetail from "./pages/UserDetail";
+import Navbar from "./components/Navbar";
+
+
+function App() {
+   return (
+    <BrowserRouter>
+     <Navbar />
+     <Routes>
+         <Route path="/" element={<Home />} />
+         <Route path="/about" element={<About />} />
+         <Route path="/users" element={<Users />} />
+         <Route path="/users/:id" element={<UserDetail />} />
+     </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+
+
+
+
+
